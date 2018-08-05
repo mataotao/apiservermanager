@@ -69,7 +69,13 @@ export default new Router({
                     path: '/permission',
                     component: resolve => require(['../components/page/Permission.vue'], resolve),
                     meta: { title: '权限测试', permission: true }
-                }
+                },
+                {
+                    // 权限菜单
+                    path: '/menu',
+                    component: resolve => require(['../components/page/menu.vue'], resolve),
+                    meta: { title: '权限菜单', permission: true }
+                },
             ]
         },
         {

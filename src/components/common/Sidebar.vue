@@ -69,6 +69,17 @@
                         ]
                     },
                     {
+                        icon: 'el-icon-setting',
+                        index: '4',
+                        title: '系统设置',
+                        subs: [
+                            {
+                                index: 'menu',
+                                title: '权限管理'
+                            },
+                        ]
+                    },
+                    {
                         icon: 'el-icon-star-on',
                         index: 'charts',
                         title: 'schart图表'

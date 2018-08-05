@@ -9,7 +9,7 @@ import "babel-polyfill";
 
 Vue.use(ElementUI, { size: 'small' });
 Vue.prototype.$axios = axios;
-
+global.DOMAIN='http://www.immt.com/'
 //使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {
     const role = localStorage.getItem('ms_username');
