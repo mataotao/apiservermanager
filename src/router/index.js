@@ -72,8 +72,14 @@ export default new Router({
                 },
                 {
                     // 权限菜单
-                    path: '/menu',
-                    component: resolve => require(['../components/page/menu.vue'], resolve),
+                    path: '/manager/menu',
+                    component: resolve => require(['../components/page/manager/menu.vue'], resolve),
+                    meta: { title: '权限菜单', permission: true }
+                },
+                {
+                    // 权限菜单
+                    path: '/manager/role',
+                    component: resolve => require(['../components/page/manager/role.vue'], resolve),
                     meta: { title: '权限菜单', permission: true }
                 },
             ]

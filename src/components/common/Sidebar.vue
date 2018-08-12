@@ -32,17 +32,17 @@
                 items: [
                     {
                         icon: 'el-icon-setting',
-                        index: 'dashboard',
+                        index: '/dashboard',
                         title: '系统首页'
                     },
                     {
                         icon: 'el-icon-tickets',
-                        index: 'table',
+                        index: '/table',
                         title: '基础表格'
                     },
                     {
                         icon: 'el-icon-message',
-                        index: 'tabs',
+                        index: '/tabs',
                         title: 'tab选项卡'
                     },
                     {
@@ -51,19 +51,19 @@
                         title: '表单相关',
                         subs: [
                             {
-                                index: 'form',
+                                index: '/form',
                                 title: '基本表单'
                             },
                             {
-                                index: 'editor',
+                                index: '/editor',
                                 title: '富文本编辑器'
                             },
                             {
-                                index: 'markdown',
+                                index: '/markdown',
                                 title: 'markdown编辑器'
                             },
                             {
-                                index: 'upload',
+                                index: '/upload',
                                 title: '文件上传'
                             }
                         ]
@@ -74,24 +74,28 @@
                         title: '系统设置',
                         subs: [
                             {
-                                index: 'menu',
+                                index: '/manager/menu',
                                 title: '权限管理'
+                            },
+                            {
+                                index: '/manager/role',
+                                title: '角色管理'
                             },
                         ]
                     },
                     {
                         icon: 'el-icon-star-on',
-                        index: 'charts',
+                        index: '/charts',
                         title: 'schart图表'
                     },
                     {
                         icon: 'el-icon-rank',
-                        index: 'drag',
+                        index: '/drag',
                         title: '拖拽列表'
                     },
                     {
                         icon: 'el-icon-warning',
-                        index: 'permission',
+                        index: '/permission',
                         title: '权限测试'
                     },
                     {

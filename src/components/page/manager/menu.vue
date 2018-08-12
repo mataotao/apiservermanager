@@ -143,10 +143,10 @@
             sc() {
                 switch (this.method) {
                     case 'add':
-                        this.sub()
+                        this.sub();
                         break;
                     case 'edit':
-                        this.update()
+                        this.update();
                         break;
                 }
             },
@@ -163,7 +163,7 @@
                             message: '修改成功',
                             type: 'success'
                         });
-                        _self.init()
+                        _self.init();
                         _self.list();
                     } else {
                         _self.$message({
@@ -180,6 +180,7 @@
                 let _self = this;
                 this.loading = true;
                 this.$axios.post(DOMAIN + 'admin/manager/permission', this.form).then(res => {
+                    _self.loading = false;
                     if (res.data.code == 0) {
                         this.dialogVisible = false;
                         _self.$message({
@@ -187,7 +188,7 @@
                             message: '新增成功',
                             type: 'success'
                         });
-                        _self.init()
+                        _self.init();
                         _self.list();
                     } else {
                         _self.$message({
@@ -201,15 +202,17 @@
             },
             append(data) {
                 this.form.Pid = data.id;
-                this.form.level = data.level + 1;
+                this.form.Level = data.level + 1;
                 this.title = '添加菜单';
                 this.dialogVisible = true;
+                this.loading = false;
                 this.method = 'add'
             },
             edit(data) {
                 this.title = '修改菜单';
                 let id = data.id;
                 this.dialogVisible = true;
+                this.loading = false;
                 this.method = 'edit'
                 this.getInfo(id);
             },
@@ -234,12 +237,7 @@
                         }
                         _self.currentLoading = false;
                     })
-                }).catch(() => {
-                    this.$message({
-                        type: 'info',
-                        message: '已取消删除'
-                    });
-                });
+                })
             },
             handleClose() {
                 this.dialogVisible = false;
@@ -248,7 +246,7 @@
             },
             init() {
                 this.form.Label = '';
-                this.form.IsContainMenu = '';
+                this.form.IsContainMenu = 1;
                 this.form.Url = '';
                 this.form.Sort = 500;
                 this.form.Level = 0;
