@@ -77,9 +77,15 @@ export default new Router({
                     meta: { title: '权限菜单', permission: true }
                 },
                 {
-                    // 权限菜单
+                    // 角色
                     path: '/manager/role',
                     component: resolve => require(['../components/page/manager/role.vue'], resolve),
+                    meta: { title: '权限菜单', permission: true }
+                },
+                {
+                    // 管理员
+                    path: '/manager/user',
+                    component: resolve => require(['../components/page/manager/user.vue'], resolve),
                     meta: { title: '权限菜单', permission: true }
                 },
             ]

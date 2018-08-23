@@ -80,6 +80,9 @@
                             {
                                 index: '/manager/role',
                                 title: '角色管理'
+                            },                           {
+                                index: '/manager/user',
+                                title: '管理员管理'
                             },
                         ]
                     },
