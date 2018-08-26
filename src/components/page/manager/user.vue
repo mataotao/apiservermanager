@@ -7,8 +7,25 @@
         </div>
         <div class="container">
             <div class="handle-box">
-                <el-input v-model="name" placeholder="筛选角色名称" class="handle-input mr10"></el-input>
-                <el-button type="primary" icon="search" @click="search">搜索</el-button>
+                <el-input v-model="search.name" placeholder="姓名" class="handle-input mr10"></el-input>
+                <el-input v-model="search.username" placeholder="用户名" class="handle-input mr10"></el-input>
+                <el-select v-model="search.status" clearable placeholder="状态">
+                    <el-option
+                        v-for="item in optionStatus"
+                        :key="item.key"
+                        :label="item.value"
+                        :value="item.key">
+                    </el-option>
+                </el-select>
+                <el-select v-model="search.role" clearable placeholder="角色">
+                    <el-option
+                        v-for="item in optionRole"
+                        :key="item.key"
+                        :label="item.value"
+                        :value="item.key">
+                    </el-option>
+                </el-select>
+                <el-button type="primary" icon="search" @click="searchList">搜索</el-button>
                 <el-button type="primary" @click="add" class="add-role">新增管理员</el-button>
             </div>
             <el-table :data="tableData" border style="width: 100%">
@@ -32,7 +49,7 @@
                 </el-table-column>
                 <el-table-column prop="role_name" label="角色名称">
                 </el-table-column>
-                <el-table-column label="操作" width="180">
+                <el-table-column label="操作" width="220">
                     <template slot-scope="scope">
                         <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
                         <el-button size="small" type="primary" v-if="scope.row.status===1">冻结</el-button>
@@ -60,26 +77,27 @@
                 <el-form-item label="手机号">
                     <el-input v-model="form.mobile"></el-input>
                 </el-form-item>
-                <el-form-item label="密码">
-                    <el-input v-model="form.password"></el-input>
+                <el-form-item label="密码" v-if="type=='add'">
+                    <el-input type="password" v-model="form.password"></el-input>
                 </el-form-item>
                 <el-form-item label="头像">
                     <el-upload
-                        :data="{field:'head_img'}"
                         class="avatar-uploader"
                         :action="url('globals/uploads')"
-                        :multiple="true"
                         :show-file-list="false"
                         :on-success="childHandleAvatarSuccess"
                         drag
                     >
-                        <img v-if="form.head_img" :src="form.head_img" class="avatar">
+                        <img v-if="form.head_img" :src="url(form.head_img)" class="avatar">
                         <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                         <div class="el-upload__tip" slot="tip">将文件拖到此处，或<em>点击上传</em></div>
                     </el-upload>
                 </el-form-item>
                 <el-form-item label="角色">
-                    <el-input v-model="form.roles"></el-input>
+                    <el-checkbox-group v-model="form.roles">
+                        <el-checkbox v-for="role in optionRole" :label="role.key" :key="role.key">{{role.value}}
+                        </el-checkbox>
+                    </el-checkbox-group>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
@@ -119,11 +137,20 @@
                     head_img: '',
                     roles: []
                 },
-                id: 0
+                id: 0,
+                optionStatus: [],
+                optionRole: [],
+                search: {
+                    name: '',
+                    username: '',
+                    role: '',
+                    status: ''
+                }
             }
         },
         created() {
             this.getData();
+            this.getCondition();
         },
         methods: {
             // 分页导航
@@ -133,7 +160,7 @@
             },
             getData() {
                 let _self = this;
-                this.$axios.get(DOMAIN + 'admin/manager/user?Page=' + this.cur_page).then((res) => {
+                this.$axios.get(DOMAIN + 'admin/manager/user?Page=' + this.cur_page + "&Name=" + this.search.name + "&Username=" + this.search.username + "&RoleId=" + this.search.role + "&Status=" + this.search.status).then((res) => {
                     if (res.data.code == 0) {
                         _self.tableData = res.data.data.list;
                         _self.count = res.data.data.count;
@@ -147,7 +174,7 @@
 
                 })
             },
-            search() {
+            searchList() {
                 this.cur_page = 1;
                 this.getData();
             },
@@ -163,10 +190,11 @@
             },
             // 保存编辑
             saveEdit() {
-                let keys = this.$refs.tree.getCheckedKeys();
-                let halfKeys = this.$refs.tree.getHalfCheckedKeys();
-                this.form.Permission = keys.concat(halfKeys);
                 let _self = this;
+                this.form.roles.forEach((v, i) => {
+                    this.form.roles[i] = parseInt(v)
+                });
+                this.form.mobile = parseInt(this.form.mobile);
                 switch (this.type) {
                     case'add':
                         _self.addSave();
@@ -179,14 +207,14 @@
             },
             addSave() {
                 let _self = this;
-                this.$axios.post(DOMAIN + 'admin/manager/role', this.form).then((res) => {
+                this.$axios.post(DOMAIN + 'admin/manager/user', this.form).then((res) => {
                     if (res.data.code == 0) {
                         _self.$message({
                             duration: 3000,
                             message: '新增成功',
                             type: 'success'
                         });
-                        _self.search();
+                        _self.searchList();
                         _self.initForm();
                         this.editVisible = false;
                     } else {
@@ -201,7 +229,7 @@
             },
             editSave() {
                 let _self = this;
-                this.$axios.put(DOMAIN + 'admin/manager/role/' + this.form.Id, this.form).then((res) => {
+                this.$axios.put(DOMAIN + 'admin/manager/user/' + this.form.Id, this.form).then((res) => {
                     if (res.data.code == 0) {
                         _self.$message({
                             duration: 3000,
@@ -279,25 +307,33 @@
                 return DOMAIN + headImage
             },
             childHandleAvatarSuccess(res, file) {
-                if (res.status == 1) {
-                    this.child.imageUrl = "/" + res.msg;
-                    this.child.form.head_img = res.msg;
+                if (res.code == 0) {
+                    this.form.head_img = res.data[0];
                     this.$message({
                         type: 'success',
                         message: '上传成功'
                     });
                 } else {
-                    this.$message.error(res.msg);
+                    this.$message.error(res.message);
                 }
 
             },
-            childBeforeAvatarUpload(file) {
-                const isLt1M = file.size / 1024 / 1024 < 1;
-                if (!isLt1M) {
-                    //this.$message.error('上传头像图片大小不能超过 1MB!');
-                }
-                return isLt1M;
-            },
+            getCondition() {
+                let _self = this;
+                this.$axios.get(DOMAIN + 'admin/condition?Role=list&User=status').then(res => {
+                    if (res.data.code == 0) {
+                        _self.optionRole = res.data.data.role.list;
+                        _self.optionStatus = res.data.data.user.status
+                    } else {
+                        _self.$message({
+                            duration: 6000,
+                            message: res.data.message,
+                            type: 'error'
+                        });
+                    }
+
+                })
+            }
         }
     }
 
