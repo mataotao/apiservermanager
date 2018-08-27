@@ -41,7 +41,7 @@
 
                     </template>
                 </el-table-column>
-                <el-table-column prop="last_time" label="上次登录时间">
+                <el-table-column prop="last_time" label="上次登录时间" width="150">
                 </el-table-column>
                 <el-table-column prop="last_ip" label="上次登录ip">
                 </el-table-column>
@@ -49,12 +49,14 @@
                 </el-table-column>
                 <el-table-column prop="role_name" label="角色名称">
                 </el-table-column>
-                <el-table-column label="操作" width="220">
+                <el-table-column label="操作" width="250">
                     <template slot-scope="scope">
                         <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-                        <el-button size="small" type="primary" v-if="scope.row.status===1">冻结</el-button>
-                        <el-button size="small" type="warning" v-else>解冻</el-button>
-                        <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除
+                        <el-button size="small" type="primary" v-if="scope.row.status===1"
+                                   @click="freeze(scope.row.id,2)">冻结
+                        </el-button>
+                        <el-button size="small" type="warning" @click="freeze(scope.row.id,1)" v-else>解冻</el-button>
+                        <el-button size="small" type="danger" @click="changePassword(scope.row.id)">修改密码
                         </el-button>
                     </template>
                 </el-table-column>
@@ -106,14 +108,6 @@
             </span>
         </el-dialog>
 
-        <!-- 删除提示框 -->
-        <el-dialog title="提示" :visible.sync="delVisible" width="300px" center>
-            <div class="del-dialog-cnt">删除不可恢复，是否确定删除？</div>
-            <span slot="footer" class="dialog-footer">
-                <el-button @click="delVisible = false">取 消</el-button>
-                <el-button type="primary" @click="deleteRow">确 定</el-button>
-            </span>
-        </el-dialog>
     </div>
 </template>
 
@@ -184,10 +178,6 @@
                 this.type = 'edit';
                 this.getInfo(row.id)
             },
-            handleDelete(index, row) {
-                this.id = row.id
-                this.delVisible = true;
-            },
             // 保存编辑
             saveEdit() {
                 let _self = this;
@@ -229,14 +219,14 @@
             },
             editSave() {
                 let _self = this;
-                this.$axios.put(DOMAIN + 'admin/manager/user/' + this.form.Id, this.form).then((res) => {
+                this.$axios.put(DOMAIN + 'admin/manager/user/' + this.form.id, this.form).then((res) => {
                     if (res.data.code == 0) {
                         _self.$message({
                             duration: 3000,
                             message: '保存成功',
                             type: 'success'
                         });
-                        _self.search();
+                        _self.searchList();
                         _self.initForm();
                         this.editVisible = false;
                     } else {
@@ -248,27 +238,6 @@
                     }
 
                 })
-            },
-            // 确定删除
-            deleteRow() {
-                let _self = this;
-                this.$axios.delete(DOMAIN + 'admin/manager/role/' + this.id).then(res => {
-                    if (res.data.code == 0) {
-                        _self.$message({
-                            duration: 6000,
-                            message: '刪除成功',
-                            type: 'success'
-                        });
-                        _self.search()
-                    } else {
-                        _self.$message({
-                            duration: 6000,
-                            message: res.data.message,
-                            type: 'error'
-                        });
-                    }
-                });
-                this.delVisible = false;
             },
             add() {
                 this.editVisible = true;
@@ -284,15 +253,14 @@
             },
             getInfo(id) {
                 let _self = this;
-                this.$axios.get(DOMAIN + 'admin/manager/role/' + id).then(res => {
+                this.$axios.get(DOMAIN + 'admin/manager/user/' + id).then(res => {
                     if (res.data.code == 0) {
-                        _self.form.Name = res.data.data.name;
-                        _self.form.Description = res.data.data.description;
-                        _self.form.Permission = res.data.data.permission;
-                        _self.form.Id = res.data.data.id;
-                        console.log(_self.form.Permission);
-                        this.$refs.tree.setCheckedKeys(_self.form.Permission);
-
+                        _self.form = res.data.data;
+                        let roles = [];
+                        _self.form.roles.forEach((v, i) => {
+                            roles[i] = v.toString()
+                        });
+                        _self.form.roles = roles
                     } else {
                         _self.$message({
                             duration: 6000,
@@ -333,6 +301,61 @@
                     }
 
                 })
+            },
+            freeze(id, status) {
+                let title = '是否冻结该用户？';
+                if (status == 1) {
+                    title = '是否解冻该用户？'
+                }
+                let _self = this;
+                this.$confirm(title, '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                    type: 'warning'
+                }).then(() => {
+                    this.$axios.put(DOMAIN + 'admin/manager/user-freeze/' + id, {status: status}).then(res => {
+                        if (res.data.code == 0) {
+                            _self.$message({
+                                duration: 6000,
+                                message: '操作成功',
+                                type: 'success'
+                            });
+                            _self.searchList()
+                        } else {
+                            _self.$message({
+                                duration: 6000,
+                                message: res.data.message,
+                                type: 'error'
+                            });
+                        }
+
+                    })
+                });
+            },
+            changePassword(id) {
+                let _self =this;
+                this.$prompt('请输入密码', '提示', {
+                    confirmButtonText: '确定',
+                    cancelButtonText: '取消',
+                }).then(({value}) => {
+                    this.$axios.put(DOMAIN + 'admin/manager/user-pwd/' + id, {password: value}).then(res => {
+                        if (res.data.code == 0) {
+                            _self.$message({
+                                duration: 6000,
+                                message: '操作成功',
+                                type: 'success'
+                            });
+                            _self.searchList()
+                        } else {
+                            _self.$message({
+                                duration: 6000,
+                                message: res.data.message,
+                                type: 'error'
+                            });
+                        }
+
+                    })
+                });
             }
         }
     }
