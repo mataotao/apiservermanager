@@ -20,6 +20,8 @@
 </template>
 
 <script>
+    import {setCookie} from "../../util/util";
+
     export default {
         data: function () {
             return {
@@ -44,6 +46,7 @@
                     if (valid) {
                         this.$axios.post(DOMAIN + '/login', this.ruleForm).then((res) => {
                             if (res.data.code == 0) {
+                                setCookie('token', res.data.data.token,20*60*1000);
                                 _self.$message({
                                     duration: 3000,
                                     message: '登录成功',
