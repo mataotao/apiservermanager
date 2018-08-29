@@ -56,6 +56,9 @@
                     <el-form-item label="排序值">
                         <el-input v-model="form.Sort" auto-complete="off"></el-input>
                     </el-form-item>
+                    <el-form-item label="条件">
+                        <el-input v-model="form.Cond" auto-complete="off"></el-input>
+                    </el-form-item>
                 </el-form>
                 <div slot="footer" class="dialog-footer">
                     <el-button @click="handleClose">取 消</el-button>
@@ -88,6 +91,7 @@
                     Sort: 500,
                     Level: 0,
                     Pid: 0,
+                    Cond: '',
                 },
                 IsContainMenu: {
                     activeValue: 1,
@@ -138,6 +142,7 @@
                 this.form.Sort = data.sort;
                 this.form.Level = data.level;
                 this.form.Pid = data.pid;
+                this.form.Cond = data.cond;
                 this.form.Id = id;
             },
             sc() {
@@ -250,7 +255,8 @@
                 this.form.Url = '';
                 this.form.Sort = 500;
                 this.form.Level = 0;
-                this.form.Pid = 0
+                this.form.Pid = 0;
+                this.form.Cond = '';
             }
         },
         mounted: function () {

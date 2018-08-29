@@ -7,12 +7,14 @@ import ElementUI from 'element-ui';
 import '../static/css/theme-green/index.css'; // 浅绿色主题
 import "babel-polyfill";
 
-import {getCookie,delCookie} from './util/util' //引用刚才我们创建的util.js文件，并使用getCookie方法
+import {delCookie, getCookie, setCookie} from './util/util' //引用刚才我们创建的util.js文件，并使用getCookie方法
 // http request 拦截器
 axios.interceptors.request.use(
     config => {
         if (getCookie('token')) {  // 判断是否存在token，如果存在的话，则每个http header都加上token
-            config.headers.Authorization = `token ${getCookie('token')}`;
+            let t = getCookie('token');
+            setCookie('token', t, 20 * 60 * 1000);
+            config.headers.Authorization = `Bearer ${t}`;
         }
         return config;
     },
@@ -46,13 +48,10 @@ Vue.prototype.$axios = axios;
 global.DOMAIN = 'http://www.immt.com/'
 //使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {
-    const role = localStorage.getItem('ms_username');
-    if (!role && to.path !== '/login') {
+    if (!getCookie('token') && to.path !== '/login') {
         next('/login');
-    } else if (to.meta.permission) {
-        // 如果是管理员权限则可进入，这里只是简单的模拟管理员权限而已
-        //role === 'admin' ? next() : next('/403');
-        next()
+    } else if (to.path === '/login' && getCookie('token')) {
+        next('/dashboard');
     } else {
         // 简单的判断IE10及以下不进入富文本编辑器，该组件不兼容
         if (navigator.userAgent.indexOf('MSIE') > -1 && to.path === '/editor') {
