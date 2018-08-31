@@ -45,7 +45,9 @@ axios.interceptors.response.use(
 
 Vue.use(ElementUI, {size: 'small'});
 Vue.prototype.$axios = axios;
-global.DOMAIN = 'http://www.immt.com/'
+Vue.prototype.$cookies = {delCookie: delCookie, setCookie: setCookie, getCookie: getCookie};
+
+global.DOMAIN = 'http://www.immt.com/';
 //使用钩子函数对路由进行权限跳转
 router.beforeEach((to, from, next) => {
     if (!getCookie('token') && to.path !== '/login') {
