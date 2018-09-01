@@ -40,6 +40,9 @@
                     <el-form-item label="菜单名称">
                         <el-input v-model="form.Label" auto-complete="off"></el-input>
                     </el-form-item>
+                    <el-form-item label="ICON">
+                        <el-input v-model="form.Icon" auto-complete="off"></el-input>
+                    </el-form-item>
                     <el-form-item label="是否是包含类型的菜单">
                         <el-switch
                             v-model="form.IsContainMenu"
@@ -86,12 +89,13 @@
                 dialogVisible: false,
                 form: {
                     Label: '',
-                    IsContainMenu: 1,
+                    IsContainMenu: 2,
                     Url: '',
                     Sort: 500,
                     Level: 0,
                     Pid: 0,
                     Cond: '',
+                    Icon: '',
                 },
                 IsContainMenu: {
                     activeValue: 1,
@@ -144,6 +148,7 @@
                 this.form.Pid = data.pid;
                 this.form.Cond = data.cond;
                 this.form.Id = id;
+                this.form.Icon = data.icon;
             },
             sc() {
                 switch (this.method) {
@@ -257,6 +262,7 @@
                 this.form.Level = 0;
                 this.form.Pid = 0;
                 this.form.Cond = '';
+                this.form.Icon = '';
             }
         },
         mounted: function () {
