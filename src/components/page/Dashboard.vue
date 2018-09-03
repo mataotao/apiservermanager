@@ -6,14 +6,14 @@
                     <el-col>
                         <el-card shadow="hover" class="mgb20">
                             <div class="user-info">
-                                <img src="static/img/img.jpg" class="user-avator" alt="">
+                                <img :src="userInfo.head_img" class="user-avator" alt="">
                                 <div class="user-info-cont">
-                                    <div class="user-info-name">{{name}}</div>
-                                    <div>{{role}}</div>
+                                    <div class="user-info-name">{{userInfo.username}}</div>
+                                    <div>{{userInfo.is_root === 1 ? '超级管理员' : '普通用户'}}</div>
                                 </div>
                             </div>
-                            <div class="user-info-list">上次登录时间：<span>2018-01-01</span></div>
-                            <div class="user-info-list">上次登录地点：<span>东莞</span></div>
+                            <div class="user-info-list">上次登录时间：<span>{{userInfo.lastTime}}</span></div>
+                            <div class="user-info-list">上次登录ip：<span>{{userInfo.lastIp}}</span></div>
                         </el-card>
                         <el-card shadow="hover">
                             <div slot="header" class="clearfix">
@@ -80,7 +80,9 @@
                         </el-table-column>
                         <el-table-column>
                             <template slot-scope="scope">
-                                <div class="todo-item" :class="{'todo-item-del': scope.row.status}">{{scope.row.title}}</div>
+                                <div class="todo-item" :class="{'todo-item-del': scope.row.status}">
+                                    {{scope.row.title}}
+                                </div>
                             </template>
                         </el-table-column>
                         <el-table-column width="60">
@@ -102,7 +104,6 @@
         name: 'dashboard',
         data() {
             return {
-                name: localStorage.getItem('ms_username'),
                 todoList: [
                     {
                         title: '今天要修复100个bug',
@@ -127,13 +128,48 @@
                         title: '今天要写100行代码加几个bug吧',
                         status: true,
                     }
-                ]
+                ],
+                userInfo: {
+                    lastTime: '',
+                    lastIp: '',
+                    username: '',
+                    is_root: 2,
+                    head_img: 'static/img/img.jpg',
+                }
             }
         },
         computed: {
             role() {
-                return this.name === 'admin' ? '超级管理员' : '普通用户';
+                return this.$userInfo.is_root === 1 ? '超级管理员' : '普通用户';
             }
+        },
+        created() {
+            this.info()
+        },
+        methods: {
+            info() {
+                let _self = this;
+                this.$axios.get(DOMAIN + 'admin/manager/current-user').then((res) => {
+                    if (res.data.code == 0) {
+
+                        _self.userInfo.username = res.data.data.username;
+                        if (res.data.data.head_img!=''){
+                            _self.userInfo.head_img = DOMAIN+res.data.data.head_img;
+                        }
+                        _self.userInfo.is_root = res.data.data.is_root;
+                        _self.userInfo.lastTime = res.data.data.last_ip;
+                        _self.userInfo.lastIp = res.data.data.last_time;
+
+                    } else {
+                        _self.$message({
+                            duration: 6000,
+                            message: res.data.message,
+                            type: 'error'
+                        });
+                    }
+
+                })
+            },
         }
     }
 

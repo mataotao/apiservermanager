@@ -23,11 +23,11 @@
                     <span class="btn-bell-badge" v-if="message"></span>
                 </div>
                 <!-- 用户头像 -->
-                <div class="user-avator"><img src="static/img/img.jpg"></div>
+                <div class="user-avator"><img :src="userInfo.head_img"></div>
                 <!-- 用户名下拉菜单 -->
                 <el-dropdown class="user-name" trigger="click" @command="handleCommand">
                     <span class="el-dropdown-link">
-                        {{username}} <i class="el-icon-caret-bottom"></i>
+                        {{userInfo.username}} <i class="el-icon-caret-bottom"></i>
                     </span>
                     <el-dropdown-menu slot="dropdown">
                         <a href="#" target="_blank">
@@ -36,7 +36,7 @@
                         <a href="#" target="_blank">
                             <el-dropdown-item>项目仓库</el-dropdown-item>
                         </a>
-                        <a :href="apiUrl('globals/caches')" target="_blank">
+                        <a :href="apiUrl('globals/caches')" target="_blank" v-if="userInfo.is_root==1">
                             <el-dropdown-item>清除缓存</el-dropdown-item>
                         </a>
                         <el-dropdown-item divided command="loginout">退出登录</el-dropdown-item>
@@ -55,15 +55,15 @@
                 collapse: true,
                 fullscreen: false,
                 name: 'mt',
-                message: 2
+                message: 2,
+                userInfo: {
+                    is_root: 2,
+                    username: '',
+                    head_img: 'static/img/img.jpg',
+                }
             }
         },
-        computed: {
-            username() {
-                let username = localStorage.getItem('ms_username');
-                return username ? username : this.name;
-            }
-        },
+        computed: {},
         methods: {
             // 用户名下拉菜单选择事件
             handleCommand(command) {
@@ -105,14 +105,17 @@
                 }
                 this.fullscreen = !this.fullscreen;
             },
-            apiUrl(url){
-                return DOMAIN+url
-            }
+            apiUrl(url) {
+                return DOMAIN + url
+            },
         },
         mounted() {
             if (document.body.clientWidth < 1500) {
                 this.collapseChage();
             }
+            this.userInfo.is_root = this.$cookies.getCookie('is_root');
+            this.userInfo.head_img = this.$cookies.getCookie('head_img')? DOMAIN+this.$cookies.getCookie('head_img'):'static/img/img.jpg';
+            this.userInfo.username = this.$cookies.getCookie('username');
         }
     }
 </script>

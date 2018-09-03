@@ -46,13 +46,21 @@
                     if (valid) {
                         this.$axios.post(DOMAIN + '/login', this.ruleForm).then((res) => {
                             if (res.data.code == 0) {
-                                setCookie('token', res.data.data.token,20*60*1000);
+                                setCookie('token', res.data.data.token, 20 * 60 * 1000);
+                                let info = {
+                                    is_root: res.data.data.is_root,
+                                    username: res.data.data.username,
+                                    head_img: res.data.data.head_img
+                                };
+                                setCookie('username', info.username, 20 * 60 * 1000);
+                                setCookie('head_img', info.head_img, 20 * 60 * 1000);
+                                setCookie('is_root', info.is_root, 20 * 60 * 1000);
                                 _self.$message({
                                     duration: 3000,
                                     message: '登录成功',
                                     type: 'success'
                                 });
-                                localStorage.setItem('ms_username', this.ruleForm.username);
+                                // localStorage.setItem('ms_username', this.ruleForm.username);
                                 this.$router.push('/');
                             } else {
                                 _self.$message({

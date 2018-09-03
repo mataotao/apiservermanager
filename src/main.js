@@ -14,6 +14,9 @@ axios.interceptors.request.use(
         if (getCookie('token')) {  // 判断是否存在token，如果存在的话，则每个http header都加上token
             let t = getCookie('token');
             setCookie('token', t, 20 * 60 * 1000);
+            setCookie('username', getCookie('username'), 20 * 60 * 1000);
+            setCookie('head_img', getCookie('head_img'), 20 * 60 * 1000);
+            setCookie('is_root', getCookie('is_root'), 20 * 60 * 1000);
             config.headers.Authorization = `Bearer ${t}`;
         }
         return config;
@@ -32,7 +35,8 @@ axios.interceptors.response.use(
             switch (error.response.status) {
                 case 401:
                     // 返回 401 清除token信息并跳转到登录页面
-                    delCookie('token')
+                    delCookie('token');
+                    delCookie('userInfo');
                     router.replace({
                         path: '/login',
                         query: {redirect: router.currentRoute.fullPath}
