@@ -71,7 +71,7 @@
         <el-dialog :title="formName" :visible.sync="editVisible" width="40%" :before-close="cancel">
             <el-form ref="form" :model="form" label-width="60px">
                 <el-form-item label="账号">
-                    <el-input v-model="form.username"></el-input>
+                    <el-input v-model="form.username" :disabled="usernameType"></el-input>
                 </el-form-item>
                 <el-form-item label="姓名">
                     <el-input v-model="form.name"></el-input>
@@ -139,7 +139,8 @@
                     username: '',
                     role: '',
                     status: ''
-                }
+                },
+                usernameType:false
             }
         },
         created() {
@@ -176,6 +177,7 @@
                 this.formName = '编辑管理员';
                 this.editVisible = true;
                 this.type = 'edit';
+                this.usernameType = true;
                 this.getInfo(row.id)
             },
             // 保存编辑
@@ -243,6 +245,7 @@
                 this.editVisible = true;
                 this.formName = '新增管理员';
                 this.type = 'add';
+                this.usernameType = false;
             },
             initForm() {
                 this.form = {name: '', username: '', mobile: '', password: "", head_img: "", roles: []}
